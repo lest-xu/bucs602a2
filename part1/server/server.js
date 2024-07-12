@@ -7,9 +7,6 @@ const cities = require('./zipCodeModule_v2');
 // Keep track of client connections
 const clients = [];
 
-// define the result for return to client
-let result = '';
-
 const server = net.createServer((socket) => {
 
 	console.log("Client connection...".red);
@@ -21,6 +18,9 @@ const server = net.createServer((socket) => {
 	// HW Code - Write the following code to process data from client
 
 	socket.on('data', (data) => {
+
+		// define the result for return to client
+		let result = '';
 
 		let input = data.toString();
 		console.log(colors.blue('...Received %s'), input);
@@ -45,8 +45,12 @@ const server = net.createServer((socket) => {
 				default:
 					break;
 			}
-		}
 
+			console.log(fName);
+		}
+		if (!result) {
+			result = 'Invalid Request';
+		}
 		// send the result back to client
 		socket.write(result);
 	});
