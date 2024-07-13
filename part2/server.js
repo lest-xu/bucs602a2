@@ -45,8 +45,16 @@ app.post('/zip', (req, res) => {
 	const zip = req.body.id;
 	// get result by zip
 	const result = cities.lookupByZipCode(zip);
-	const data = { data: result };
-	res.render('lookupByZipView', data); // render view
+	// check result
+	if (result) {
+		const data = { data: result };
+		res.render('lookupByZipView', data); // render view
+	} else {
+		// no results found 
+		res.status(404);
+		res.render('404');
+	}
+
 });
 
 // Implement the JSON, XML, & HTML formats
@@ -57,28 +65,35 @@ app.get('/zip/:id', (req, res) => {
 	console.log('zip2', zip);
 	// get result by zip
 	const result = cities.lookupByZipCode(zip);
-	const data = { data: result };
 
-	// check the header JSON, XML, & HTML formats
-	const header = req.headers.accept;
-	console.log('header', header);
-	if (header.includes('application/json')) {
-		res.json(result); // send json result
-	} else if (header === 'application/xml') {
-		// define the xml format
-		const xml = `<?xml version="1.0"?>
-			<zipCode id="${result._id}">
-				<city>${result.city}</city>
-				<state>${result.state}</state>
-				<pop>${result.pop}</pop>
-			</zipCode>
-		`;
-		res.type('application/xml');
-		res.send(xml); // send xml result
+	// make sure the result is found
+	if (result) {
+		const data = { data: result };
+
+		// check the header JSON, XML, & HTML formats
+		const header = req.headers.accept;
+		console.log('header', header);
+		if (header.includes('application/json')) {
+			res.json(result); // send json result
+		} else if (header === 'application/xml') {
+			// define the xml format
+			const xml = `<?xml version="1.0"?>
+				<zipCode id="${result._id}">
+					<city>${result.city}</city>
+					<state>${result.state}</state>
+					<pop>${result.pop}</pop>
+				</zipCode>
+			`;
+			res.type('application/xml');
+			res.send(xml); // send xml result
+		} else {
+			console.log('reading the zip view');
+			res.render('lookupByZipView', data); // render view
+		}
 	} else {
-		console.log('reading the zip view');
-		res.render('lookupByZipView', data); // render view
+		res.status(404).send('Not found.');
 	}
+
 
 });
 
