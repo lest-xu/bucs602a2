@@ -66,11 +66,12 @@ app.get('/zip/:id', (req, res) => {
 		res.json(result); // send json result
 	} else if (header === 'application/xml') {
 		// define the xml format
-		const xml = `
-			<zip>${result._id}</zip>
-			<city>${result.city}</city>
-			<state>${result.state}</state>
-			<pop>${result.pop}</pop>
+		const xml = `<?xml version="1.0"?>
+			<zipCode id="${result._id}">
+				<city>${result.city}</city>
+				<state>${result.state}</state>
+				<pop>${result.pop}</pop>
+			</zipCode>
 		`;
 		res.type('application/xml');
 		res.send(xml); // send xml result
