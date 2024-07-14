@@ -104,9 +104,15 @@ app.get('/city', (req, res) => {
 	const state = req.query.state;
 	if (city && state) {
 		// get result by zip
-		const result = cities.lookupByCityState(city,state);
-		const data = { data: result };
-		res.render('lookupByCityStateView', data); // render view
+		const result = cities.lookupByCityState(city.toUpperCase(), state.toUpperCase());
+		if (result.data.length > 0) {
+			res.render('lookupByCityStateView', result); // render view
+		} else {
+			// no data found 
+			res.status(404);
+			res.render('404');
+		}
+
 	} else {
 		res.render('lookupByCityStateForm'); // not present render lookupByZipForm
 	}
@@ -135,9 +141,9 @@ app.get('/city/:city/state/:state', (req, res) => {
 	// get city and state from the params
 	const city = req.params.city;
 	const state = req.params.state;
-	
+
 	// get result by city and state
-	const result = cities.lookupByCityState(city,state);
+	const result = cities.lookupByCityState(city.toUpperCase(), state.toUpperCase());
 	// console.log(result);
 	// make sure the result is found
 	if (result.data.length > 0) {
