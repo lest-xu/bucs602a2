@@ -62,7 +62,6 @@ app.post('/zip', (req, res) => {
 app.get('/zip/:id', (req, res) => {
 	// get zip param
 	const zip = req.params.id;
-	console.log('zip2', zip);
 	// get result by zip
 	const result = cities.lookupByZipCode(zip);
 
@@ -100,7 +99,6 @@ app.get('/zip/:id', (req, res) => {
 
 // GET /city
 app.get('/city', (req, res) => {
-
 	// get city and state from query url
 	const city = req.query.city;
 	const state = req.query.state;
@@ -123,7 +121,6 @@ app.post('/city', (req, res) => {
 	const result = cities.lookupByCityState(city.toUpperCase(), state.toUpperCase());
 	// check result
 	if (result) {
-		console.log(result);
 		res.render('lookupByCityStateView', result); // render view
 	} else {
 		// no results found 
@@ -135,9 +132,41 @@ app.post('/city', (req, res) => {
 // Implement the JSON, XML, & HTML formats
 
 app.get('/city/:city/state/:state', (req, res) => {
+	// get city and state from the params
+	const city = req.params.city;
+	const state = req.params.state;
+	
+	// get result by city and state
+	const result = cities.lookupByCityState(city,state);
+	// console.log(result);
+	// make sure the result is found
+	if (result.data.length > 0) {
+		// check the header JSON, XML, & HTML formats
+		const header = req.headers.accept;
+		console.log('header', header);
+		if (header.includes('application/json')) {
+			res.json(result); // send json result
+		} else if (header === 'application/xml') {
+			console.log(result.data);
+			// define the xml format
+			let xml = `<?xml version="1.0"?>
+				<cityState city="${result.city}" state="${result.state}">
+			`;
+			// loop the data add entry to xml
+			result.data.forEach(item => {
+				xml += `<entry zip="${item.zip}" pop="${item.pop}" />`;
+			});
+			// add closing tag for xml
+			xml += "</cityState>";
 
-
-
+			res.type('application/xml');
+			res.send(xml); // send xml result
+		} else {
+			res.render('lookupByCityStateView', result); // render view
+		}
+	} else {
+		res.status(404).send('Not found.');
+	}
 });
 
 
