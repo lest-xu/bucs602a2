@@ -175,7 +175,7 @@ app.get('/city/:city/state/:state', (req, res) => {
 });
 
 
-
+// GET /pop
 app.get('/pop', (req, res) => {
 	// get state from query url
 	const state = req.query.state;
