@@ -125,7 +125,7 @@ app.post('/city', (req, res) => {
 	// get result by city and state
 	const result = cities.lookupByCityState(city.toUpperCase(), state.toUpperCase());
 	// check result
-	if (result) {
+	if (result.data.length > 0) {
 		res.render('lookupByCityStateView', result); // render view
 	} else {
 		// no results found 
@@ -177,17 +177,23 @@ app.get('/city/:city/state/:state', (req, res) => {
 
 
 app.get('/pop', (req, res) => {
-
 	// get state from query url
 	const state = req.query.state;
+	
 	// check if state exist
 	if (state) {
 		// get population by state
 		const result = cities.getPopulationByState(state);
-		console.log(result);
-		res.render('populationView', result); // render view
+		// make sure result is found
+		if (result.pop) {
+			res.render('populationView', result); // render view
+		} else {
+			// no results found 
+			res.status(404);
+			res.render('404');
+		}
 	} else {
-		res.render('populationForm'); // no zip present render lookupByZipForm
+		res.render('populationForm'); // no sate present render populationForm
 	}
 
 });
@@ -200,7 +206,7 @@ app.get('/pop/:state', (req, res) => {
 
 	// get result by state
 	const result = cities.getPopulationByState(state.toUpperCase());
-	// console.log(result);
+	
 	// make sure the result is found
 	if (result) {
 		// check the header JSON, XML, & HTML formats
@@ -220,7 +226,14 @@ app.get('/pop/:state', (req, res) => {
 			res.type('application/xml');
 			res.send(xml); // send xml result
 		} else {
-			res.render('populationView', result); // render view
+			// make sure found the result
+			if (result.pop > 0) {
+				res.render('populationView', result); // render HTML view
+			} else {
+				// no results found 
+				res.status(404);
+				res.render('404');
+			}
 		}
 	} else {
 		res.status(404).send('Not found.');
