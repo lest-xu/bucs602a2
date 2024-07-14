@@ -203,7 +203,6 @@ app.get('/pop', (req, res) => {
 app.get('/pop/:state', (req, res) => {
 	// get the state from the params
 	const state = req.params.state;
-
 	// get result by state
 	const result = cities.getPopulationByState(state.toUpperCase());
 	
