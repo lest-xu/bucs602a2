@@ -149,11 +149,11 @@ app.get('/city/:city/state/:state', (req, res) => {
 	if (result.data.length > 0) {
 		// check the header JSON, XML, & HTML formats
 		const header = req.headers.accept;
-		console.log('header', header);
+		
 		if (header.includes('application/json')) {
 			res.json(result); // send json result
 		} else if (header === 'application/xml') {
-			console.log(result.data);
+			
 			// define the xml format
 			let xml = `<?xml version="1.0"?>
 				<cityState city="${result.city}" state="${result.state}">
