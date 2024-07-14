@@ -71,7 +71,7 @@ app.get('/zip/:id', (req, res) => {
 
 		// check the header JSON, XML, & HTML formats
 		const header = req.headers.accept;
-		console.log('header', header);
+		
 		if (header.includes('application/json')) {
 			res.json(result); // send json result
 		} else if (header === 'application/xml') {
@@ -86,7 +86,6 @@ app.get('/zip/:id', (req, res) => {
 			res.type('application/xml');
 			res.send(xml); // send xml result
 		} else {
-			console.log('reading the zip view');
 			res.render('lookupByZipView', data); // render view
 		}
 	} else {
@@ -103,7 +102,7 @@ app.get('/city', (req, res) => {
 	const city = req.query.city;
 	const state = req.query.state;
 	if (city && state) {
-		// get result by zip
+		// get result by city and state
 		const result = cities.lookupByCityState(city.toUpperCase(), state.toUpperCase());
 		if (result.data.length > 0) {
 			res.render('lookupByCityStateView', result); // render view
@@ -149,11 +148,11 @@ app.get('/city/:city/state/:state', (req, res) => {
 	if (result.data.length > 0) {
 		// check the header JSON, XML, & HTML formats
 		const header = req.headers.accept;
-		
+
 		if (header.includes('application/json')) {
 			res.json(result); // send json result
 		} else if (header === 'application/xml') {
-			
+
 			// define the xml format
 			let xml = `<?xml version="1.0"?>
 				<cityState city="${result.city}" state="${result.state}">
@@ -179,13 +178,53 @@ app.get('/city/:city/state/:state', (req, res) => {
 
 app.get('/pop', (req, res) => {
 
+	// get state from query url
+	const state = req.query.state;
+	// check if state exist
+	if (state) {
+		// get population by state
+		const result = cities.getPopulationByState(state);
+		console.log(result);
+		res.render('populationView', result); // render view
+	} else {
+		res.render('populationForm'); // no zip present render lookupByZipForm
+	}
 
 });
 
 // Implement the JSON, XML, & HTML formats
 
 app.get('/pop/:state', (req, res) => {
+	// get the state from the params
+	const state = req.params.state;
 
+	// get result by state
+	const result = cities.getPopulationByState(state.toUpperCase());
+	// console.log(result);
+	// make sure the result is found
+	if (result) {
+		// check the header JSON, XML, & HTML formats
+		const header = req.headers.accept;
+
+		if (header.includes('application/json')) {
+			res.json(result); // send json result
+		} else if (header === 'application/xml') {
+
+			// define the xml format
+			let xml = `<?xml version="1.0"?>
+				<statePop state="${result.state}">
+					<pop/>${result.pop}</pop>
+				</statePop>
+			`;
+
+			res.type('application/xml');
+			res.send(xml); // send xml result
+		} else {
+			res.render('populationView', result); // render view
+		}
+	} else {
+		res.status(404).send('Not found.');
+	}
 
 });
 
