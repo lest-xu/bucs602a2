@@ -98,15 +98,38 @@ app.get('/zip/:id', (req, res) => {
 });
 
 
-
+// GET /city
 app.get('/city', (req, res) => {
 
-
+	// get city and state from query url
+	const city = req.query.city;
+	const state = req.query.state;
+	if (city && state) {
+		// get result by zip
+		const result = cities.lookupByCityState(city,state);
+		const data = { data: result };
+		res.render('lookupByCityStateView', data); // render view
+	} else {
+		res.render('lookupByCityStateForm'); // not present render lookupByZipForm
+	}
 });
 
+// POST /city
 app.post('/city', (req, res) => {
-
-
+	// get city and state from form's request body
+	const city = req.body.city;
+	const state = req.body.state;
+	// get result by city and state
+	const result = cities.lookupByCityState(city.toUpperCase(), state.toUpperCase());
+	// check result
+	if (result) {
+		console.log(result);
+		res.render('lookupByCityStateView', result); // render view
+	} else {
+		// no results found 
+		res.status(404);
+		res.render('404');
+	}
 });
 
 // Implement the JSON, XML, & HTML formats
